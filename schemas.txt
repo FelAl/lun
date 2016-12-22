@@ -1,0 +1,177 @@
+DATABASE management:
+`sudo docker run -P -e USER=local -e PASSWORD=local -e ENCODING=UTF8 jamesbrink/postgres` - our database
+
+```
+CREATE DATABASE "dblun";
+\l - show databases
+\q - quit
+postgres@f2ecc14babd0:~$ psql dblun  - login to database dblun
+
+```
+
+Airports
+
+26762,"WALR","medium_airport","Juwata Airport",3.32666666667,117.569444444,23,"AS","ID","ID-U-A","Tarakan Island","yes","WAQQ","TRK","TRK","http://www.tarakan-airport.com","http://en.wikipedia.org/wiki/Juwata_Airport","WRLR, WALR, WAQQ, TRK, JUWATA"
+
+"id",  - id
+"ident", - 4 characters   * varchar(4)
+"type",  20 characters, ("medium_airport", "helicopter") * varchar(20)
+"name",  100 characters ("Daniel Airport")  * varchar(100)
+"latitude_deg", 25 characters  digit (30.353200912475586)    * float(20)
+"longitude_deg", 25 characters (-89.91950225830001) * float(20)
+"elevation_ft", digit integer * int 
+"continent", 4 characters  * varchar(4)
+"iso_country", 10 characters  * varchar(10) 
+"iso_region",  30 characters * varchar(30)
+"municipality", 3 characters "yes/no" * varchar(3)
+"scheduled_service", 10 characters ("4ANG") * varchar(10)
+"gps_code",  10 characters ("4ANG")   * varchar(10)
+"iata_code", 10 characters (TRK) * varchar(10)
+"local_code", 10 characters (TRK) * varchar(10)
+"home_link", 100 characters (http://......) * varchar(100)
+"wikipedia_link",  120 characters (http://......) * varchar(120)
+"keywords", 100 characters ("WRLR, WALR, WAQQ, TRK, JUWATA") * varchar(100)
+
+
+CREATE TABLE "table"
+(
+"id" SERIAL primary key,
+"ident" varchar(4),
+"type" varchar(20),
+"name" varchar(100), 
+"latitude_deg" float(20), 
+"longitude_deg" float(20),
+"elevation_ft" int,
+"continent" varchar(4),
+"iso_country" varchar(10),
+"iso_region" varchar (30),
+"municipality" varchar(3),
+"scheduled_service" varchar(10),
+"gps_code" varchar(10),
+"iata_code" varchar(10),
+"local_code" varchar(10),
+"home_link" varchar(100),
+"wikipedia_link" varchar(120),
+"keywords" varchar(100)
+);
+
+remove the first line with column descriptions
+
+sudo docker cp /home/af/mkdev/lun/airsortedby1.csv f2e:/air.csv
+
+
+COPY "table" ("id", "ident", "type", "latitude_deg", "longitude_deg", "elevation_ft", "continent", "iso_country", "iso_region", "municipality",
+  "scheduled_service", "gps_code", "iata_code", "local_code", "home_link", "wikipedia_link", "keywords")
+  FROM '/air.csv' DELIMITER ',' CSV;
+
+
+COPY "table" FROM '/air.csv' DELIMITER ',' CSV;
+
+
+//  Final, works
+CREATE TABLE "AIRPORTS"
+(
+"id" SERIAL primary key,
+"ident" varchar(10),
+"type" varchar(20),
+"name" varchar(100), 
+"latitude_deg" float(20), 
+"longitude_deg" float(20),
+"elevation_ft" int,
+"continent" varchar(4),
+"iso_country" varchar(10),
+"iso_region" varchar (30),
+"municipality" varchar(70),
+"scheduled_service" varchar(10),
+"gps_code" varchar(10),
+"iata_code" varchar(10),
+"local_code" varchar(10),
+"home_link" varchar(300),
+"wikipedia_link" varchar(300),
+"keywords" varchar(300)
+);
+
+COPY "AIRPORTS" FROM '/air.csv' DELIMITER ',' CSV;
+
+//  check
+ select * from "AIRPORTS" where (id = 2);
+
+
+Runways
+
+233222,27064,"YMMB",1873,60,"ASP",1,0,"04",-37.98,145.098,39,47,232,"22",-37.9765,145.102,46,227,98
+
+"id",   - id 
+"airport_ref", - foreing key(to airport) * REFERENCES "table" (id)
+"airport_ident", 4 characters  *  varchar(4)
+"length_ft", digit int * int
+"width_ft", digt in * int
+"surface", 10 characters *   varchar(10)
+"lighted", short digit (true/false) * smallint
+"closed",  short digit (true false) * smallint
+"le_ident",  varchar(5)
+"le_latitude_deg",  float(6)
+"le_longitude_deg",  float(6)
+"le_elevation_ft", digit int * int 
+"le_heading_degT", digit int * int
+"le_displaced_threshold_ft", digit int * int
+"he_ident" varchar(5),
+"he_latitude_deg" float(10),
+"he_longitude_deg" float(10),
+"he_elevation_ft" int,
+"he_heading_degT" int,
+"he_displaced_threshold_ft" int
+
+Final, works
+```
+CREATE TABLE "RUNWAYS"
+(
+"id" SERIAL primary key,
+"airport_ref" int REFERENCES "AIRPORTS" (id),
+"airport_ident" varchar(10),
+"length_ft" int,
+"width_ft" int,
+"surface" varchar(70),
+"lighted" smallint,
+"closed"  smallint,
+"le_ident" varchar(10),
+"le_latitude_deg" varchar(10),
+"le_longitude_deg"  varchar(10),
+"le_elevation_ft" int ,
+"le_heading_degT" float(5), 
+"le_displaced_threshold_ft" int,
+"he_ident" varchar(10),
+"he_latitude_deg" float(10),
+"he_longitude_deg" float(10),
+"he_elevation_ft" int,
+"he_heading_degT" float(5),
+"he_displaced_threshold_ft" int
+);
+
+sudo docker cp /home/af/mkdev/lun/runsortedbyair.csv f2e:/runs.csv
+
+COPY "RUNWAYS" FROM '/runs.csv' DELIMITER ',' CSV;
+
+select * from "RUNWAYS" where (id = 233222);
+
+```
+
+
+
+
+"id","code","name","continent","wikipedia_link","keywords"
+302672,"AD","Andorra","EU","http://en.wikipedia.org/wiki/Andorra",
+
+
+CREATE TABLE "COUNTRIES"
+(
+"id" SERIAL primary key,
+"code" varchar(10),
+"name" varchar(120),
+"continent" varchar(10), 
+"wikipedia_link" varchar(300),
+"keywords" varchar(300)
+);
+
+COPY "COUNTRIES" FROM '/cs.csv' DELIMITER ',' CSV;
+
