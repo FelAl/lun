@@ -11,10 +11,10 @@ libraryDependencies ++= Seq(
   cache,
   ws,
   "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test,
-  "com.softwaremill.macwire" %% "macros" % "2.2.0" % "provided",
-  "com.softwaremill.macwire" %% "util" % "2.2.0"
+  "com.typesafe.slick" %% "slick" % "3.1.1",
+  "com.typesafe.slick" %% "slick-hikaricp" % "3.1.1",
+  "com.zaxxer" % "HikariCP-java6" % "2.3.2",
+  "org.postgresql" % "postgresql" % "9.4-1201-jdbc41"
 )
-
-resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
 
 pipelineStages := Seq(digest)

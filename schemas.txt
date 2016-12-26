@@ -73,7 +73,7 @@ CREATE TABLE "AIRPORTS"
 (
 "id" SERIAL primary key,
 "ident" varchar(10),
-"type" varchar(20),
+"typ" varchar(20),
 "name" varchar(100), 
 "latitude_deg" float(20), 
 "longitude_deg" float(20),
