@@ -8,13 +8,15 @@ import scala.concurrent.duration._
 
 import com.typesafe.config.ConfigFactory
 
-case class Country(id: Int, code: Option[String], name: Option[String], continent: Option[String],
+import scala.reflect.runtime.universe._
+
+case class Country(id: Int, code: String, name: String, continent: Option[String],
   wikipedia_link: Option[String], keywords: Option[String])
 
 class Countries (tag: Tag) extends Table[Country](tag, "COUNTRIES") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-  def code = column[Option[String]]("code")
-  def name = column[Option[String]]("name")
+  def code = column[String]("code")
+  def name = column[String]("name")
   def continent = column[Option[String]]("continent")
   def wikipedia_link = column[Option[String]]("wikipedia_link")
   def keywords = column[Option[String]]("keywords")
@@ -93,6 +95,7 @@ object AirportsDAO extends TableQuery(new Airports(_)) {
   }
 
 
+
   def findById(id: Int): Future[Option[Airport]] = {
     db.run(airports.filter(_.id === id).result).map(_.headOption)
   }
@@ -151,6 +154,12 @@ object RunwaysDAO extends TableQuery(new Runways(_)) {
     db.run(runways.filter(_.id === id).result).map(_.headOption)
   }
 
+  def findByAirport(id_air: Int) = {
+    db.run(this.filter(_.airport_ref === id_air).result)
+  }
+
+
+
   // val leastVar = runways.sortBy(_.le_ident.desc).take(10)
 
   // def least: Future[Seq[Runway]] = leastVar
@@ -160,4 +169,76 @@ object RunwaysDAO extends TableQuery(new Runways(_)) {
   def deleteById(id: Int): Future[Int] = {
     db.run(this.filter(_.id === id).delete)
   }
+}
+
+
+object ReportGenerator {
+  def typeOfRunwaysPerCountry: Seq[Vector[AnyRef]] = {
+    val countriesF = CountriesDAO.all
+    val countries = Await.result(countriesF, 10.seconds)
+
+    val resultR = for {
+      country <- countries 
+      val roadsTypes = ReportGenerator.roadsInCountry(country.code)
+      val roadsPerCounty = Vector(country.name, roadsTypes)
+
+    } yield roadsPerCounty
+    resultR
+  }
+
+
+  def roadsInCountry(country: String): String = {
+    val airportsF = AirportsDAO.findByCountry(country)
+    val airports = Await.result(airportsF, 10.seconds)
+    val allRoads = for { 
+      airport <- airports 
+      val runwaysPerAirportF = RunwaysDAO.findByAirport(airport.id)
+      val runwaysPerAirport = Await.result(runwaysPerAirportF, 10.seconds)
+      runwaysFlat <- runwaysPerAirport
+    } yield runwaysFlat
+    val typeOfRoads = allRoads.flatMap(_.surface)
+    println("typeOfRoads in " + country + " " + typeOfRoads)
+
+    val distinctTypes = typeOfRoads.distinct
+    val distinctToLC = distinctTypes.map(_.toLowerCase).distinct
+    println("distinctType  in " + country + " " + distinctToLC)
+    distinctToLC.mkString(" <br> ")
+    // println(allRoads)
+  }
+
+  def sortByAirports = {
+    val countriesF = CountriesDAO.all
+    val countries = Await.result(countriesF, 10.seconds)
+    val resultR = for {
+      country <- countries
+      val airportsNumber = ReportGenerator.airportsQuantity(country.code)
+      val airportNumberPerCountry = (country.name, airportsNumber)
+    } yield airportNumberPerCountry
+
+    println("******")
+    println(resultR.sortBy(_._2))
+    println("******")
+    // val quantity = ReportGenerator.airportsQuantity("RU")
+    // ("RU", quantity)
+    resultR.sortBy(_._2)
+  }
+
+  def airportsQuantity(country: String) = {
+    val resF = AirportsDAO.findByCountry(country)
+    val res = Await.result(resF, 1.seconds)
+    println(country + " : " + res.length)
+    res.length
+  }
+
+
+
+
+}
+
+object Recognizer {
+  def recognize[T](x: T)(implicit tag: TypeTag[T]): String =
+    tag.tpe match {
+      case TypeRef(utype, usymbol, args) =>
+        List(utype, usymbol, args).mkString("\n")
+    }
 }

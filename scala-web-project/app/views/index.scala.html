@@ -1,4 +1,5 @@
-@(countries: Seq[Country], airports: Seq[Airport], runways: Seq[Runway])
+@(runways: Seq[Runway], result: Seq[Vector[AnyRef]],
+least: Seq[(String, Int)], most: Seq[(String, Int)])
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -54,28 +55,32 @@
                       <li class="active">
                         <a  href="#1b" data-toggle="tab">Top 10</a>
                       </li>
-                      <li><a href="#2b" data-toggle="tab">Runways</a>
+                      <li><a href="#2b" data-toggle="tab">Anti-Top 10</a>
                       </li>
-                      <li><a href="#3b" data-toggle="tab">Top 5</a>
+                      <li><a href="#3b" data-toggle="tab">Type of runways</a>
                       </li>
                     </ul>
                     <div class="tab-content clearfix">
                       <div class="tab-pane active" id="1b">
-                        <h5>One</h5>
-                        <h5>Two</h5>
-                        <h5>Three</h5>
-                        <h5>Four</h5>
-                        <h5>Five</h5>
+                        <ul>
+                          @most.map { res =>
+                          <li>@res._1 . there are: @res._2 airports</li>
+                          }
+                        </ul>
                       </div>
                       <div class="tab-pane" id="2b">
-                        <h5>One1</h5>
-                        <h5>Two1</h5>
-                        <h5>Three1</h5>
-                        <h5>Four1</h5>
-                        <h5>Five1</h5>
+                        <ul>
+                          @least.map { res =>
+                          <li>@res._1 . there are: @res._2 airports</li>
+                          }
+                        </ul>
                       </div>
                       <div class="tab-pane" id="3b">
-                        <h5>Content</h5>
+                        <ul>
+                          @result.map { res =>
+                          <li>@res(0). Types of runways: <br> @Html(res(1).toString)</li>
+                          }
+                        </ul>
                       </div>
                     </div>
                   </div>

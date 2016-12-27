@@ -13,6 +13,9 @@ import models._
 import scala.concurrent.{Await}
 import scala.concurrent.duration._
 
+
+import scala.reflect.runtime.universe._
+
 class Application extends Controller {
   val countriesF = CountriesDAO.all
   val airportsF = AirportsDAO.all
@@ -21,13 +24,44 @@ class Application extends Controller {
   val airports = Await.result(airportsF, 10.seconds)
   val runways = Await.result(runwaysF, 10 seconds)
 
-
-  val airportsPerCountryF = AirportsDAO.findByCountry("GE")
-  val airportsPerCountry = Await.result(airportsPerCountryF, 10.seconds)
-  println(airportsPerCountry)
-
-  // val airportsPerCountry = AirportsDAO.findByCountry("EN")
+  // val airportsPerCountryF = AirportsDAO.findByCountry("GE")
+  // val airportsPerCountry = Await.result(airportsPerCountryF, 10.seconds)
   // println(airportsPerCountry)
+
+  // println("==========")
+  // println("==========")
+  // println("==========")
+  // println("==========")
+
+  // val runwaysPerAirportF = RunwaysDAO.findByAirport(20883)
+  // val runwaysPerAirport = Await.result(runwaysPerAirportF, 10.seconds)
+  // println(runwaysPerAirport)
+  // val surfaces = runwaysPerAirport.flatMap(_.surface)
+  // println(surfaces)
+  // println("=====")
+  // println(surfaces.distinct.length)
+  // println("=====")
+
+
+
+  // ReportGenerator.roadsInCountry("RU")
+  // Works! 
+  // val result = ReportGenerator.typeOfRunwaysPerCountry
+  // println("========zzzzzzzzz========")
+  // println(result)
+  // val filteredRes=result.filter(x => !(x(1).toString == ""))
+  // val reconClass = Recognizer.recognize(result)
+  // println(reconClass)
+  // Works!
+
+
+  val airsPerCountry = ReportGenerator.sortByAirports
+  val least = airsPerCountry.take(10)
+  val most = airsPerCountry.takeRight(10).reverse
+
+  println("most ====" + most)
+
+  println("least ====" + least)
 
 
   // val least = RunwaysDAO.least
@@ -35,7 +69,7 @@ class Application extends Controller {
   def index = Action {
     // val temperature = 10
 
-    Ok(views.html.index(countries, airports, runways))
+    Ok(views.html.index(runways, Seq(Vector("RUS", "one <br> two <br>")), least, most))
   }
 
   def findWays = Action {
