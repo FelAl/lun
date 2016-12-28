@@ -1,5 +1,6 @@
-@(runways: Seq[Runway], result: Seq[Vector[AnyRef]],
-least: Seq[(String, Int)], most: Seq[(String, Int)])
+@(runways: Seq[Runway], runwayTypes: Seq[Vector[AnyRef]],
+least: Seq[(String, Int)], most: Seq[(String, Int)],
+info: Seq[(String, Seq[Int])])
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -29,9 +30,9 @@ least: Seq[(String, Int)], most: Seq[(String, Int)])
             <div class="panel-body">
               <div class="row">
                 <div class="col-lg-12">
-                  <form id="login-form" action="http://phpoll.com/login/process" method="post" role="form" style="display: block;">
+                  <form id="login-form" action="http://localhost:9000/" method="post" role="form" style="display: block;">
                     <div class="form-group">
-                      <input type="text" name="username" id="username" tabindex="1" class="form-control" placeholder="Country code/name" value="">
+                      <input type="text" name="code" id="code" tabindex="1" class="form-control" placeholder="Country code/name" value="">
                     </div>
                     <div class="form-group">
                       <div class="row">
@@ -77,7 +78,7 @@ least: Seq[(String, Int)], most: Seq[(String, Int)])
                       </div>
                       <div class="tab-pane" id="3b">
                         <ul>
-                          @result.map { res =>
+                          @runwayTypes.map { res =>
                           <li>@res(0). Types of runways: <br> @Html(res(1).toString)</li>
                           }
                         </ul>

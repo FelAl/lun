@@ -24,56 +24,44 @@ class Application extends Controller {
   val airports = Await.result(airportsF, 10.seconds)
   val runways = Await.result(runwaysF, 10 seconds)
 
-  // val airportsPerCountryF = AirportsDAO.findByCountry("GE")
-  // val airportsPerCountry = Await.result(airportsPerCountryF, 10.seconds)
-  // println(airportsPerCountry)
-
-  // println("==========")
-  // println("==========")
-  // println("==========")
-  // println("==========")
-
-  // val runwaysPerAirportF = RunwaysDAO.findByAirport(20883)
-  // val runwaysPerAirport = Await.result(runwaysPerAirportF, 10.seconds)
-  // println(runwaysPerAirport)
-  // val surfaces = runwaysPerAirport.flatMap(_.surface)
-  // println(surfaces)
-  // println("=====")
-  // println(surfaces.distinct.length)
-  // println("=====")
-
-
-
-  // ReportGenerator.roadsInCountry("RU")
-  // Works! 
-  // val result = ReportGenerator.typeOfRunwaysPerCountry
-  // println("========zzzzzzzzz========")
-  // println(result)
-  // val filteredRes=result.filter(x => !(x(1).toString == ""))
-  // val reconClass = Recognizer.recognize(result)
-  // println(reconClass)
-  // Works!
-
-
   val airsPerCountry = ReportGenerator.sortByAirports
   val least = airsPerCountry.take(10)
   val most = airsPerCountry.takeRight(10).reverse
-
-  println("most ====" + most)
-
-  println("least ====" + least)
+  val runwayTypes = ReportGenerator.typeOfRunwaysPerCountry
 
 
-  // val least = RunwaysDAO.least
-  // println(least)
+  println("on start only!!!!!")
+  println("on start only!!!!!")
+  println("on start only!!!!!")
+  println("on start only!!!!!")
+  println("on start only!!!!!")
+  println("on start only!!!!!")
+  println("on start only!!!!!")
+  println("on start only!!!!!")
   def index = Action {
     // val temperature = 10
+    val info: Seq[(String, Seq[Int])] = ReportGenerator.infoAboutCountry("RU")
 
-    Ok(views.html.index(runways, Seq(Vector("RUS", "one <br> two <br>")), least, most))
+    Ok(views.html.index(runways, runwayTypes, least, most, info))
   }
 
-  def findWays = Action {
-    Ok
+  def findInfo = Action { implicit request =>
+    println(request)
+    
+
+    request.body.asFormUrlEncoded.map { request =>
+       println(request.get("code"))
+       val code = request.get("code").head
+       println("***!!!****")
+       println(code(0))  
+       val info: Seq[(String, Seq[Int])] = ReportGenerator.infoAboutCountry(code(0).toString)
+       println(info)
+       Ok(views.html.index(runways, Seq(Vector("RUS", "one <br> two <br>")), least, most, info))
+    } .getOrElse {
+    BadRequest("Expecting application/json request body")
+  }
+    // println(request.body.get("code"))
+   
   }
 
 }

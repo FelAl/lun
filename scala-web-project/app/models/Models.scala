@@ -26,7 +26,6 @@ class Countries (tag: Tag) extends Table[Country](tag, "COUNTRIES") {
 }
 
 object CountriesDAO extends TableQuery(new Countries(_)) {
-  // println(Database.getClass) -> slick.jdbc.JdbcBackend$$anon$3
   val conf = ConfigFactory.load()
   val db = Database.forConfig("databaseUrl")
 
@@ -71,30 +70,19 @@ class Airports (tag: Tag) extends Table[Airport](tag, "AIRPORTS") {
   def keywords = column[Option[String]]("keywords")
 
   def * = (id, ident, typ, name, latitude_deg, longitude_deg, elevation_ft, continent,
-    iso_country, iso_region, municipality, scheduled_service, gps_code, iata_code, local_code, home_link,
-    wikipedia_link, keywords) <> (Airport.tupled, Airport.unapply)
+    iso_country, iso_region, municipality, scheduled_service, gps_code, iata_code, local_code,
+    home_link, wikipedia_link, keywords) <> (Airport.tupled, Airport.unapply)
 }
 
 object AirportsDAO extends TableQuery(new Airports(_)) {
-  // println(Database.getClass) -> slick.jdbc.JdbcBackend$$anon$3
   val conf = ConfigFactory.load()
   val db = Database.forConfig("databaseUrl")
 
   val airports = TableQuery[Airports]
 
-  // val addressesQuery = airports.flatMap(_.iso_country)
-  // val iso_countries = db.run(addressesQuery.result)
-  // println(iso_countries)
-
-  // def findByCountry(iso_country: String): Future[Option[Seq[Airport]]] = {
-  //   db.run((airports.map(_.iso_country === iso_country)).result)
-  // }
-
   def findByCountry(iso_country: String) = {
     db.run(this.filter(_.iso_country === iso_country).result)
   }
-
-
 
   def findById(id: Int): Future[Option[Airport]] = {
     db.run(airports.filter(_.id === id).result).map(_.headOption)
@@ -144,7 +132,6 @@ class Runways (tag: Tag) extends Table[Runway](tag, "RUNWAYS") {
 }
 
 object RunwaysDAO extends TableQuery(new Runways(_)) {
-  // println(Database.getClass) -> slick.jdbc.JdbcBackend$$anon$3
   val conf = ConfigFactory.load()
   val db = Database.forConfig("databaseUrl")
 
@@ -157,12 +144,6 @@ object RunwaysDAO extends TableQuery(new Runways(_)) {
   def findByAirport(id_air: Int) = {
     db.run(this.filter(_.airport_ref === id_air).result)
   }
-
-
-
-  // val leastVar = runways.sortBy(_.le_ident.desc).take(10)
-
-  // def least: Future[Seq[Runway]] = leastVar
 
   def all: Future[Seq[Runway]] = db.run(runways.result)
 
@@ -185,7 +166,6 @@ object ReportGenerator {
     } yield roadsPerCounty
     resultR
   }
-
 
   def roadsInCountry(country: String): String = {
     val airportsF = AirportsDAO.findByCountry(country)
@@ -215,24 +195,32 @@ object ReportGenerator {
       val airportNumberPerCountry = (country.name, airportsNumber)
     } yield airportNumberPerCountry
 
-    println("******")
-    println(resultR.sortBy(_._2))
-    println("******")
-    // val quantity = ReportGenerator.airportsQuantity("RU")
-    // ("RU", quantity)
     resultR.sortBy(_._2)
   }
 
   def airportsQuantity(country: String) = {
     val resF = AirportsDAO.findByCountry(country)
     val res = Await.result(resF, 1.seconds)
-    println(country + " : " + res.length)
+    // println(country + " : " + res.length)
     res.length
   }
 
+  def infoAboutCountry(country: String) = {
+    val airportsF = AirportsDAO.findByCountry(country)
+    val airports = Await.result(airportsF, 10.seconds)
 
-
-
+    val airPlusRoads = for {
+      airport <- airports
+      runwaysPerAirportF = RunwaysDAO.findByAirport(airport.id)
+      runwaysPerAirport = Await.result(runwaysPerAirportF, 10.seconds)
+    } yield (airport.name, runwaysPerAirport)
+    airPlusRoads
+    val filtered = airPlusRoads.filter(x => !x._2.isEmpty)
+    val result = filtered.map(airRoad => 
+      (airRoad._1, airRoad._2.map (runway =>
+        runway.id)))
+    result
+  }
 }
 
 object Recognizer {
