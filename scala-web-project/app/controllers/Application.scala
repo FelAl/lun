@@ -9,6 +9,7 @@ import play.api.Play.current
 import play.api.libs.ws._
 import scala.concurrent.ExecutionContext.Implicits.global
 import models._
+import models.CMapping
 
 import scala.concurrent.{Await}
 import scala.concurrent.duration._
@@ -53,12 +54,13 @@ class Application @Inject() (cache: CacheApi) extends Controller {
 
       println("***!!!****")
       println(code(0))
-      // val info: Seq[(String, Vector[Int])] = UTry(ReportGenerator
-      // val info = UTry(ReportGenerator
-      //   .infoAboutCountry(code(0).toString))
-      //   .getOrElse[Seq[(String, Seq[Int])]](Vector(("default",Vector(0))))
 
-      val res = UTry(infoAboutCountries(code(0).toLowerCase))
+      val fcode = code(0) match {
+        case str if (str.length > 2) => UTry(CMapping.nameToCode(str)).getOrElse("None")
+        case str if (str.length == 2) => str
+      }
+
+      val res = UTry(infoAboutCountries(fcode.toLowerCase))
 
       val info = res match {
         case USuccess(result) if (!result.isEmpty) => result
@@ -70,9 +72,6 @@ class Application @Inject() (cache: CacheApi) extends Controller {
         case b if(!(b.isEmpty == true)) => b(0).toString
       }
 
-      // println(info)
-      // println("==")
-      // println(resCode + "|")
       Ok(views.html.index(runwayTypes, least, most, info, resCode))
     } .getOrElse {
       BadRequest("Expecting request body")

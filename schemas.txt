@@ -175,3 +175,11 @@ CREATE TABLE "COUNTRIES"
 
 COPY "COUNTRIES" FROM '/cs.csv' DELIMITER ',' CSV;
 
+
+
+awk -F "\"*,\"*" '{print $3"->"$2}' countries.csv
+`South Africa->ZA`
+awk -F "\"*,\"*" '{print "\""$3"\"""->""\""$2"\""}' countries.csv 
+`"South Africa"->"ZA"`
+ awk -F "\"*,\"*" '{print "\""$3"\"""->""\""$2"\""","}' countries.csv 
+`"South Africa"->"ZA",`
