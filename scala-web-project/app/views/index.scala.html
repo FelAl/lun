@@ -1,6 +1,7 @@
-@(runways: Seq[Runway], runwayTypes: Seq[Vector[AnyRef]],
+@(runwayTypes: Seq[Vector[AnyRef]],
 least: Seq[(String, Int)], most: Seq[(String, Int)],
-info: Seq[(String, Seq[Int])])
+info: Seq[(String, Seq[Int])] = Vector(("default",Vector(0))),
+country: String = "None")
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -43,8 +44,15 @@ info: Seq[(String, Seq[Int])])
 
                       <div>
                         <ul>
-                          @runways.map { country =>
-                          <li>@country.airport_ident</li>}
+                            @if(!(info(0)._1 == "default")) {
+                              @info.map { airAndRoads =>
+                               <li>@airAndRoads._1 has roads @airAndRoads._2.mkString(",") </li>
+                              }
+                            } 
+                            @if(!(country == "None") && (info(0)._1 == "default")) {
+                              <h5> No results @country </h5>
+                            }
+                            
                         </ul>
                       </div>
                     </div>
@@ -65,14 +73,14 @@ info: Seq[(String, Seq[Int])])
                       <div class="tab-pane active" id="1b">
                         <ul>
                           @most.map { res =>
-                          <li>@res._1 . there are: @res._2 airports</li>
+                          <li>@res._1. there are: @res._2 airports</li>
                           }
                         </ul>
                       </div>
                       <div class="tab-pane" id="2b">
                         <ul>
                           @least.map { res =>
-                          <li>@res._1 . there are: @res._2 airports</li>
+                          <li>@res._1. there are: @res._2 airports</li>
                           }
                         </ul>
                       </div>

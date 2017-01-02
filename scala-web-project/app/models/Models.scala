@@ -156,7 +156,7 @@ object RunwaysDAO extends TableQuery(new Runways(_)) {
 object ReportGenerator {
   def typeOfRunwaysPerCountry: Seq[Vector[AnyRef]] = {
     val countriesF = CountriesDAO.all
-    val countries = Await.result(countriesF, 10.seconds)
+    val countries = Await.result(countriesF, 10.seconds).take(4)
 
     val resultR = for {
       country <- countries 
@@ -205,6 +205,18 @@ object ReportGenerator {
     res.length
   }
 
+  // def infoAboutCountries: Seq[(String, Seq[(String, Seq[Int])])] = {
+  def infoAboutCountries: Map[String,Seq[(String, Seq[Int])]] = {
+    val countriesF = CountriesDAO.all
+    val countries = Await.result(countriesF, 10.seconds).take(4)
+    val result = for {
+      country <- countries
+
+      info = ReportGenerator.infoAboutCountry(country.code)
+    } yield (country.code.toLowerCase, info)
+    result.toMap
+  }
+
   def infoAboutCountry(country: String) = {
     val airportsF = AirportsDAO.findByCountry(country)
     val airports = Await.result(airportsF, 10.seconds)
@@ -219,6 +231,7 @@ object ReportGenerator {
     val result = filtered.map(airRoad => 
       (airRoad._1, airRoad._2.map (runway =>
         runway.id)))
+    println("Processing: " + country) 
     result
   }
 }
