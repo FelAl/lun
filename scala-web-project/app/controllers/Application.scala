@@ -9,13 +9,15 @@ import play.api.Play.current
 import play.api.libs.ws._
 import scala.concurrent.ExecutionContext.Implicits.global
 import models._
-import models.CMapping
+// import models.CMapping
+import database._
+import services._
 
 import scala.concurrent.{Await}
 import scala.concurrent.duration._
 
-import scala.reflect.runtime.universe._
-import scala.util.{Try => UTry, Success => USuccess, Failure => UFailure}
+// import scala.reflect.runtime.universe._
+import scala.util.{Try, Success, Failure}
 
 // caching
 import play.api.cache._
@@ -56,14 +58,14 @@ class Application @Inject() (cache: CacheApi) extends Controller {
       println(code(0))
 
       val fcode = code(0) match {
-        case str if (str.length > 2) => UTry(CMapping.nameToCode(str)).getOrElse("None")
+        case str if (str.length > 2) => Try(CMapping.nameToCode(str)).getOrElse("None")
         case str if (str.length == 2) => str
       }
 
-      val res = UTry(infoAboutCountries(fcode.toLowerCase))
+      val res = Try(infoAboutCountries(fcode.toLowerCase))
 
       val info = res match {
-        case USuccess(result) if (!result.isEmpty) => result
+        case Success(result) if (!result.isEmpty) => result
         case _ => Vector(("default",Vector(0)))
       }
 
