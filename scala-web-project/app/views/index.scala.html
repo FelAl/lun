@@ -188,7 +188,9 @@ country: String = "None")
                       <div class="tab-pane" id="3b">
                         <ul>
                           @runwayTypes.map { res =>
-                          <li>@res(0). Types of runways: <br> @Html(res(1).toString)</li>
+                            @if(!(res(1) == "")) {
+                              <li>@res(0). Types of runways: <br> @Html(res(1).toString)</li>
+                            }
                           }
                         </ul>
                       </div>
