@@ -48,16 +48,16 @@ object ReportGenerator {
     distinctToLC.mkString(" <br> ")
   }
 
-  def sortByAirports = {
+  def sortByAirports: Seq[CountryRunways] = {
     val countriesF = CountriesDAO.all
     val countries = Await.result(countriesF, 10.seconds)
-    val resultR = for {
+    val result = for {
       country <- countries
       airportsNumber = ReportGenerator.airportsQuantity(country.code)
       airportNumberPerCountry = CountryRunways(country.name, airportsNumber)
     } yield airportNumberPerCountry
 
-    resultR.sortBy(_.quantity)
+    result.sortBy(_.quantity)
   }
 
   def airportsQuantity(country: String) = {
@@ -88,11 +88,7 @@ object ReportGenerator {
       runwaysIds = runwaysPerAirport.map(runway => runway.id)
     } yield AirportInfo(airport.name, runwaysIds)
     val filtered = airPlusRoads.filter(x => !x.runways.isEmpty)
-    // val result: CountryInfo = filtered.map(airRoad => 
-    //   (airRoad.name, airRoad.runways.map (runway =>
-    //     runway.id)))
     println("Processing: " + country) 
-    // filtered
     val result = CountryInfo(filtered)
     result
   }

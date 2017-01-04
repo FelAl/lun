@@ -5,20 +5,16 @@ import play.api.mvc._
 import org.joda.time.{DateTime, DateTimeZone}
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import org.joda.time.format.ISODateTimeFormat
-import play.api.Play.current
-import play.api.libs.ws._
+// import play.api.Play.current
 import scala.concurrent.ExecutionContext.Implicits.global
 import models._
-// import models.CMapping
 import database._
 import services._
 
 import scala.concurrent.{Await}
 import scala.concurrent.duration._
-
 import scala.util.{Try, Success, Failure}
 
-// caching
 import play.api.cache._
 import javax.inject.Inject
 
@@ -41,20 +37,17 @@ class Application @Inject() (cache: CacheApi) extends Controller {
     } 
 
   def index = Action {
-    val countries = CountryInfo(Vector(AirportInfo("default",Vector(0))))
+    val countries = CountryInfo(Vector(AirportInfo("default", Vector(0))))
 
     Ok(views.html.index(runwayTypes, least, most, countries, "None"))
   }
 
   def findInfo = Action { implicit request =>
-    println(request)
-    
     request.body.asFormUrlEncoded.map { request =>
       println(request.get("code"))
       val code = request.get("code").head
 
-      println("***!!!****")
-      println(code(0))
+      println("Input: " + code(0))
 
       val fcode = code(0) match {
         case str if (str.length > 2) => Try(CMapping.nameToCode(str)).getOrElse("None")
