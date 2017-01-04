@@ -2,11 +2,6 @@ package controllers
 
 import play.api._
 import play.api.mvc._
-import org.joda.time.{DateTime, DateTimeZone}
-import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
-import org.joda.time.format.ISODateTimeFormat
-// import play.api.Play.current
-import scala.concurrent.ExecutionContext.Implicits.global
 import models._
 import database._
 import services._
