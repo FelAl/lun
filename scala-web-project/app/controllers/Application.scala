@@ -23,27 +23,27 @@ import play.api.cache._
 import javax.inject.Inject
 
 class Application @Inject() (cache: CacheApi) extends Controller {
-  val airsPerCountry: Seq[(String, Int)] = cache.
-    getOrElse[Seq[(String, Int)]]("airsPerCountry") {
+  val airsPerCountry: Seq[CountryRunways] = cache.
+    getOrElse[Seq[CountryRunways]]("airsPerCountry") {
       ReportGenerator.sortByAirports
     }
   val least = airsPerCountry.take(10)
   val most = airsPerCountry.takeRight(10).reverse
 
-  val runwayTypes: Seq[Vector[AnyRef]] = cache.
-    getOrElse[Seq[Vector[AnyRef]]]("runwayTypes") {
+  val runwayTypes: Seq[RunwayTypes] = cache.
+    getOrElse[Seq[RunwayTypes]]("runwayTypes") {
       ReportGenerator.typeOfRunwaysPerCountry
     } 
 
-  val infoAboutCountries: Map[String,Seq[(String, Seq[Int])]] = cache. 
-    getOrElse[Map[String,Seq[(String, Seq[Int])]]]("infoAboutCountries") {
+  val infoAboutCountries: Map[String,CountryInfo] = cache. 
+    getOrElse[Map[String,CountryInfo]]("infoAboutCountries") {
       ReportGenerator.infoAboutCountries
     } 
 
   def index = Action {
-    val info = Vector(("default",Vector(0)))
+    val countries = CountryInfo(Vector(AirportInfo("default",Vector(0))))
 
-    Ok(views.html.index(runwayTypes, least, most, info, "None"))
+    Ok(views.html.index(runwayTypes, least, most, countries, "None"))
   }
 
   def findInfo = Action { implicit request =>
@@ -63,9 +63,9 @@ class Application @Inject() (cache: CacheApi) extends Controller {
 
       val res = Try(infoAboutCountries(fcode.toLowerCase))
 
-      val info = res match {
-        case Success(result) if (!result.isEmpty) => result
-        case _ => Vector(("default",Vector(0)))
+      val countries = res match {
+        case Success(result) if (!result.info.isEmpty) => result
+        case _ => CountryInfo(Vector(AirportInfo("default",Vector(0))))
       }
 
       val resCode = code match {
@@ -73,7 +73,7 @@ class Application @Inject() (cache: CacheApi) extends Controller {
         case b if(!(b.isEmpty == true)) => b(0).toString
       }
 
-      Ok(views.html.index(runwayTypes, least, most, info, resCode))
+      Ok(views.html.index(runwayTypes, least, most, countries, resCode))
     } .getOrElse {
       BadRequest("Expecting request body")
     }   

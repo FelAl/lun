@@ -1,14 +1,3 @@
-DATABASE management:
-`sudo docker run -P -e USER=local -e PASSWORD=local -e ENCODING=UTF8 jamesbrink/postgres` - our database
-
-```
-CREATE DATABASE "dblun";
-\l - show databases
-\q - quit
-postgres@f2ecc14babd0:~$ psql dblun  - login to database dblun
-
-```
-
 Airports
 
 26762,"WALR","medium_airport","Juwata Airport",3.32666666667,117.569444444,23,"AS","ID","ID-U-A","Tarakan Island","yes","WAQQ","TRK","TRK","http://www.tarakan-airport.com","http://en.wikipedia.org/wiki/Juwata_Airport","WRLR, WALR, WAQQ, TRK, JUWATA"

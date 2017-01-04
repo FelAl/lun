@@ -1,6 +1,7 @@
-@(runwayTypes: Seq[Vector[AnyRef]],
-least: Seq[(String, Int)], most: Seq[(String, Int)],
-info: Seq[(String, Seq[Int])] = Vector(("default",Vector(0))),
+@import services.{RunwayTypes,CountryInfo,AirportInfo, CountryRunways}
+@(runwayTypes: Seq[RunwayTypes],
+least: Seq[CountryRunways], most: Seq[CountryRunways],
+countries: CountryInfo = CountryInfo(Vector(AirportInfo("default",Vector(0)))),
 country: String = "None")
 <!DOCTYPE html>
 <html lang="en">
@@ -145,12 +146,12 @@ country: String = "None")
 
                       <div>
                         <ul>
-                            @if(!(info(0)._1 == "default")) {
-                              @info.map { airAndRoads =>
-                               <li>@airAndRoads._1 has roads @airAndRoads._2.mkString(",") </li>
+                            @if(!(countries.info(0).name == "default")) {
+                              @countries.info.map { airAndRoads =>
+                               <li>@airAndRoads.name has roads @airAndRoads.runways.mkString(",") </li>
                               }
                             } 
-                            @if(!(country == "None") && (info(0)._1 == "default")) {
+                            @if(!(country == "None") && (countries.info(0).name == "default")) {
                               <h5> No results @country </h5>
                             }
                             
@@ -174,22 +175,22 @@ country: String = "None")
                       <div class="tab-pane active" id="1b">
                         <ul>
                           @most.map { res =>
-                          <li>@res._1. there are: @res._2 airports</li>
+                          <li>@res.country. Number of airports: @res.quantity airports</li>
                           }
                         </ul>
                       </div>
                       <div class="tab-pane" id="2b">
                         <ul>
                           @least.map { res =>
-                          <li>@res._1. there are: @res._2 airports</li>
+                          <li>@res.country. Number of airports: @res.quantity airports</li>
                           }
                         </ul>
                       </div>
                       <div class="tab-pane" id="3b">
                         <ul>
                           @runwayTypes.map { res =>
-                            @if(!(res(1) == "")) {
-                              <li>@res(0). Types of runways: <br> @Html(res(1).toString)</li>
+                            @if(!(res.types == "")) {
+                              <li>@res.country. Types of runways: <br> @Html(res.types.toString)</li>
                             }
                           }
                         </ul>
