@@ -29,11 +29,12 @@ class Application @Inject() (cache: CacheApi) extends Controller {
   val infoAboutCountries: Map[String,CountryInfo] = cache. 
     getOrElse[Map[String,CountryInfo]]("infoAboutCountries") {
       ReportGenerator.infoAboutCountries
-    } 
+    }
+  val countriesNone = CountryInfo(Vector(AirportInfo("default", Vector(0))))
 
   def index = Action {
-    val countries = CountryInfo(Vector(AirportInfo("default", Vector(0))))
-
+    val countries = countriesNone
+    
     Ok(views.html.index(runwayTypes, least, most, countries, "None"))
   }
 
@@ -53,7 +54,7 @@ class Application @Inject() (cache: CacheApi) extends Controller {
 
       val countries = res match {
         case Success(result) if (!result.info.isEmpty) => result
-        case _ => CountryInfo(Vector(AirportInfo("default",Vector(0))))
+        case _ => countriesNone
       }
 
       val resCode = code match {
