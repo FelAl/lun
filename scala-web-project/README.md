@@ -8,5 +8,7 @@ CREATE DATABASE "dblun";
 postgres@f2ecc14babd0:~$ psql dblun  - login to database dblun
 
 ```
+Parsing of `*.csv` files in `../schemas.txt`
 
+Run application:
 `activator run` - development mode(localhost:9000)
