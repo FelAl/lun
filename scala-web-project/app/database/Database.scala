@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 
 import com.typesafe.config.ConfigFactory
 
-object CountriesDAO extends TableQuery(new Countries(_)) {
+object CountriesDAO {
   val conf = ConfigFactory.load()
   val db = Database.forConfig("databaseUrl")
 
@@ -22,18 +22,18 @@ object CountriesDAO extends TableQuery(new Countries(_)) {
   def all: Future[Seq[Country]] = db.run(countries.result)
 
   def deleteById(id: Int): Future[Int] = {
-    db.run(this.filter(_.id === id).delete)
+    db.run(countries.filter(_.id === id).delete)
   }
 }
 
-object AirportsDAO extends TableQuery(new Airports(_)) {
+object AirportsDAO {
   val conf = ConfigFactory.load()
   val db = Database.forConfig("databaseUrl")
 
   val airports = TableQuery[Airports]
 
   def findByCountry(iso_country: String): Future[Seq[Airport]] = {
-    db.run(this.filter(_.iso_country === iso_country).result)
+    db.run(airports.filter(_.iso_country === iso_country).result)
   }
 
   def findById(id: Int): Future[Option[Airport]] = {
@@ -43,11 +43,11 @@ object AirportsDAO extends TableQuery(new Airports(_)) {
   def all: Future[Seq[Airport]] = db.run(airports.result)
 
   def deleteById(id: Int): Future[Int] = {
-    db.run(this.filter(_.id === id).delete)
+    db.run(airports.filter(_.id === id).delete)
   }
 }
 
-object RunwaysDAO extends TableQuery(new Runways(_)) {
+object RunwaysDAO {
   val conf = ConfigFactory.load()
   val db = Database.forConfig("databaseUrl")
 
@@ -58,12 +58,12 @@ object RunwaysDAO extends TableQuery(new Runways(_)) {
   }
 
   def findByAirport(id_air: Int) = {
-    db.run(this.filter(_.airport_ref === id_air).result)
+    db.run(runways.filter(_.airport_ref === id_air).result)
   }
 
   def all: Future[Seq[Runway]] = db.run(runways.result)
 
   def deleteById(id: Int): Future[Int] = {
-    db.run(this.filter(_.id === id).delete)
+    db.run(runways.filter(_.id === id).delete)
   }
 }
