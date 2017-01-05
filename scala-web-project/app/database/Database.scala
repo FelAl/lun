@@ -16,14 +16,14 @@ object CountriesDAO {
   val countries = TableQuery[Countries]
 
   def findById(id: Int): Future[Option[Country]] = {
-    db.run(countries.filter(_.id === id).result).map(_.headOption)
+    val q = countries.filter(_.id === id)
+    val action = q.result
+    val result = db.run(action)
+    val finalResult = result.map(_.headOption)
+    finalResult
   }
 
   def all: Future[Seq[Country]] = db.run(countries.result)
-
-  def deleteById(id: Int): Future[Int] = {
-    db.run(countries.filter(_.id === id).delete)
-  }
 }
 
 object AirportsDAO {
@@ -33,18 +33,21 @@ object AirportsDAO {
   val airports = TableQuery[Airports]
 
   def findByCountry(iso_country: String): Future[Seq[Airport]] = {
-    db.run(airports.filter(_.iso_country === iso_country).result)
+    val q = airports.filter(_.iso_country === iso_country)
+    val action = q.result
+    val result = db.run(action)
+    result
   }
 
   def findById(id: Int): Future[Option[Airport]] = {
-    db.run(airports.filter(_.id === id).result).map(_.headOption)
+    val q = airports.filter(_.id === id)
+    val action = q.result
+    val result = db.run(action)
+    val finalResult = result.map(_.headOption)
+    finalResult
   }
 
   def all: Future[Seq[Airport]] = db.run(airports.result)
-
-  def deleteById(id: Int): Future[Int] = {
-    db.run(airports.filter(_.id === id).delete)
-  }
 }
 
 object RunwaysDAO {
@@ -54,16 +57,20 @@ object RunwaysDAO {
   val runways = TableQuery[Runways]
 
   def findById(id: Int): Future[Option[Runway]] = {
-    db.run(runways.filter(_.id === id).result).map(_.headOption)
+    val q = runways.filter(_.id === id)
+    val action = q.result
+    val result = db.run(action)
+    val finalResult = result.map(_.headOption)
+    finalResult
+
   }
 
   def findByAirport(id_air: Int) = {
-    db.run(runways.filter(_.airport_ref === id_air).result)
+    val q = runways.filter(_.airport_ref === id_air)
+    val action = q.result
+    val result = db.run(action)
+    result
   }
 
   def all: Future[Seq[Runway]] = db.run(runways.result)
-
-  def deleteById(id: Int): Future[Int] = {
-    db.run(runways.filter(_.id === id).delete)
-  }
 }
