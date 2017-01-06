@@ -165,6 +165,12 @@ CREATE TABLE "COUNTRIES"
 COPY "COUNTRIES" FROM '/cs.csv' DELIMITER ',' CSV;
 
 
+Indexes:
+create index "RUNWAY_IDX" on "RUNWAYS" ("airport_ref");
+create index "AIRPORT_IDX" on "AIRPORTS" ("iso_country");
+
+
+
 
 awk -F "\"*,\"*" '{print $3"->"$2}' countries.csv
 `South Africa->ZA`
