@@ -44,8 +44,14 @@ class Application @Inject() (cache: CacheApi) extends Controller {
       val code = request.get("code").head
 
       println("Input: " + code(0))
+      val str_filtered = """[ ]*[a-zA-Z ]+$""".r findFirstIn code(0)
+      val str_f = str_filtered match {
+        case Some(str) if (str.forall(_ == ' ')) => "None"
+        case Some(str) if (str.length > 0) => str
+        case _ => "None"
+      }
 
-      val fcode = code(0) match {
+      val fcode = str_f match {
         case str if (str.length > 2) => Try(CMapping.nameToCode(str)).getOrElse("None")
         case str if (str.length == 2) => str
       }
@@ -57,9 +63,9 @@ class Application @Inject() (cache: CacheApi) extends Controller {
         case _ => countriesNone
       }
 
-      val resCode = code match {
+      val resCode = str_f match {
         case c if (c.forall(_ == ' ')) => "None"
-        case b if(!(b.isEmpty == true)) => b(0).toString
+        case b if(!(b.isEmpty == true)) => b.toString
       }
 
       Ok(views.html.index(runwayTypes, least, most, countries, resCode))
