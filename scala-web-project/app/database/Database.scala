@@ -74,3 +74,10 @@ object RunwaysDAO {
 
   def all: Future[Seq[Runway]] = db.run(runways.result)
 }
+
+object CMappingDB {
+  val countriesF = CountriesDAO.all
+  val countries = Await.result(countriesF, 1.seconds)
+  val nameToCodeSeq = countries.map(c => c.name.toLowerCase -> c.code)
+  val nameToCodeMap = nameToCodeSeq.toMap
+}

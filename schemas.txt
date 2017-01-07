@@ -48,14 +48,11 @@ remove the first line with column descriptions
 
 sudo docker cp /home/af/mkdev/lun/airsortedby1.csv f2e:/air.csv
 
-
 COPY "table" ("id", "ident", "type", "latitude_deg", "longitude_deg", "elevation_ft", "continent", "iso_country", "iso_region", "municipality",
   "scheduled_service", "gps_code", "iata_code", "local_code", "home_link", "wikipedia_link", "keywords")
   FROM '/air.csv' DELIMITER ',' CSV;
 
-
 COPY "table" FROM '/air.csv' DELIMITER ',' CSV;
-
 
 //  Final, works
 CREATE TABLE "AIRPORTS"
@@ -145,9 +142,6 @@ select * from "RUNWAYS" where (id = 233222);
 
 ```
 
-
-
-
 "id","code","name","continent","wikipedia_link","keywords"
 302672,"AD","Andorra","EU","http://en.wikipedia.org/wiki/Andorra",
 
@@ -164,13 +158,9 @@ CREATE TABLE "COUNTRIES"
 
 COPY "COUNTRIES" FROM '/cs.csv' DELIMITER ',' CSV;
 
-
 Indexes:
 create index "RUNWAY_IDX" on "RUNWAYS" ("airport_ref");
 create index "AIRPORT_IDX" on "AIRPORTS" ("iso_country");
-
-
-
 
 awk -F "\"*,\"*" '{print $3"->"$2}' countries.csv
 `South Africa->ZA`
@@ -178,3 +168,5 @@ awk -F "\"*,\"*" '{print "\""$3"\"""->""\""$2"\""}' countries.csv
 `"South Africa"->"ZA"`
  awk -F "\"*,\"*" '{print "\""$3"\"""->""\""$2"\""","}' countries.csv 
 `"South Africa"->"ZA",`
+
+[a-zA-Z\\s]*

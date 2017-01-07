@@ -52,10 +52,12 @@ class Application @Inject() (cache: CacheApi) extends Controller {
       }
 
       val fcode = str_f match {
-        case str if (str.length > 2) => Try(CMapping.nameToCode(str)).getOrElse("None")
+        case str if (str.length > 2) => Try(CMappingDB.nameToCodeMap(str.toLowerCase))
+          .getOrElse("None")
         case str if (str.length == 2) => str
       }
 
+      println("Actual code: " + fcode)
       val res = Try(infoAboutCountries(fcode.toLowerCase))
 
       val countries = res match {
