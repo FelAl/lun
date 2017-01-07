@@ -14,28 +14,34 @@ import play.api.cache._
 import javax.inject.Inject
 
 class Application @Inject() (cache: CacheApi) extends Controller {
-  val airsPerCountry: Seq[CountryRunways] = cache.
-    getOrElse[Seq[CountryRunways]]("airsPerCountry") {
+  val airsPerCountry: Seq[CountryRunways] = cache
+    .getOrElse[Seq[CountryRunways]]("airsPerCountry") {
       ReportGenerator.sortByAirports
     }
   val least = airsPerCountry.take(10)
   val most = airsPerCountry.takeRight(10).reverse
 
-  val runwayTypes: Seq[RunwayTypes] = cache.
-    getOrElse[Seq[RunwayTypes]]("runwayTypes") {
+  val runwayTypes: Seq[RunwayTypes] = cache
+    .getOrElse[Seq[RunwayTypes]]("runwayTypes") {
       ReportGenerator.typeOfRunwaysPerCountry
     } 
 
-  val infoAboutCountries: Map[String,CountryInfo] = cache. 
-    getOrElse[Map[String,CountryInfo]]("infoAboutCountries") {
+  val infoAboutCountries: Map[String,CountryInfo] = cache
+    .getOrElse[Map[String,CountryInfo]]("infoAboutCountries") {
       ReportGenerator.infoAboutCountries
     }
+
+  val runwaysLeIdent = cache
+    .getOrElse[Seq[RunwayLeIdent]]("runwaysLeIdent") {
+      ReportDB.runwaysLeIdent
+    }
+  println(runwaysLeIdent)
   val countriesNone = CountryInfo(Vector(AirportInfo("default", Vector(0))))
 
   def index = Action {
     val countries = countriesNone
     
-    Ok(views.html.index(runwayTypes, least, most, countries, "None"))
+    Ok(views.html.index(runwayTypes, least, most, countries, "None", runwaysLeIdent))
   }
 
   def findInfo = Action { implicit request =>
@@ -70,7 +76,7 @@ class Application @Inject() (cache: CacheApi) extends Controller {
         case b if(!(b.isEmpty == true)) => b.toString
       }
 
-      Ok(views.html.index(runwayTypes, least, most, countries, resCode))
+      Ok(views.html.index(runwayTypes, least, most, countries, resCode, runwaysLeIdent))
     } .getOrElse {
       BadRequest("Expecting request body")
     }   

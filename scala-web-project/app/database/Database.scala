@@ -9,6 +9,7 @@ import scala.concurrent.duration._
 
 import com.typesafe.config.ConfigFactory
 
+case class RunwayLeIdent(le_ident: String, quantity: Int)
 object CountriesDAO {
   val conf = ConfigFactory.load()
   val db = Database.forConfig("databaseUrl")
@@ -80,4 +81,17 @@ object CMappingDB {
   val countries = Await.result(countriesF, 1.seconds)
   val nameToCodeSeq = countries.map(c => c.name.toLowerCase -> c.code)
   val nameToCodeMap = nameToCodeSeq.toMap
+}
+
+object ReportDB {
+  val conf = ConfigFactory.load()
+  val db = Database.forConfig("databaseUrl")
+
+  def runwaysLeIdent: Seq[RunwayLeIdent] = {
+    val q = sql"""SELECT le_ident, count(*) from "RUNWAYS" 
+      group by "le_ident" order by count(*) desc LIMIT 10;""".as[(String, Int)]
+    val resF = db.run(q)
+    val res = Await.result(resF, 1.seconds).map(x => RunwayLeIdent(x._1, x._2))
+    res
+  }
 }

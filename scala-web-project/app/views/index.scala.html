@@ -1,8 +1,9 @@
 @import services.{RunwayTypes,CountryInfo,AirportInfo, CountryRunways}
+@import database.{RunwayLeIdent}
 @(runwayTypes: Seq[RunwayTypes],
 least: Seq[CountryRunways], most: Seq[CountryRunways],
 countries: CountryInfo = CountryInfo(Vector(AirportInfo("default",Vector(0)))),
-country: String = "None")
+country: String = "None", runwaysLeIdent: Seq[RunwayLeIdent])
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -170,6 +171,8 @@ country: String = "None")
                       </li>
                       <li><a href="#3b" data-toggle="tab">Types of runways</a>
                       </li>
+                      <li><a href="#4b" data-toggle="tab">Le_ident </a>
+                      </li>
                     </ul>
                     <div class="tab-content clearfix">
                       <div class="tab-pane active" id="1b">
@@ -192,6 +195,13 @@ country: String = "None")
                             @if(!(res.types == "")) {
                               <li>@res.country. Types of runways: <br> @Html(res.types.toString)</li>
                             }
+                          }
+                        </ul>
+                      </div>
+                      <div class="tab-pane" id="4b">
+                        <ul>
+                          @runwaysLeIdent.map { res =>
+                          <li>"@res.le_ident". Number of mentions: @res.quantity</li>
                           }
                         </ul>
                       </div>
