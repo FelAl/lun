@@ -10,6 +10,7 @@ import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
 
 case class RunwayLeIdent(le_ident: String, quantity: Int)
+
 object CountriesDAO {
   val conf = ConfigFactory.load()
   val db = Database.forConfig("databaseUrl")
@@ -81,6 +82,24 @@ object CMappingDB {
   val countries = Await.result(countriesF, 1.seconds)
   val nameToCodeSeq = countries.map(c => c.name.toLowerCase -> c.code)
   val nameToCodeMap = nameToCodeSeq.toMap
+
+  def returnFullName(str: String) = {
+    println("fullName method + params: " + str)
+    val keys = nameToCodeMap.keys
+    val filtered_keys = for 
+      {key <- keys 
+        if ((key.length >= str.length) &&
+          (key.substring(0, str.length).toLowerCase == str.toLowerCase))}
+      yield key
+    println("filtered keys:  " + filtered_keys)
+    val result = filtered_keys match {
+      case x if (filtered_keys.size == 1) => x
+      case _ => Set("None")
+    }
+    println("result fullName: " + result)
+    val res = result.toSeq(0)
+    res
+  }
 }
 
 object ReportDB {

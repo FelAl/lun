@@ -40,7 +40,7 @@ class Application @Inject() (cache: CacheApi) extends Controller {
 
   def index = Action {
     val countries = countriesNone
-    
+
     Ok(views.html.index(runwayTypes, least, most, countries, "None", runwaysLeIdent))
   }
 
@@ -56,8 +56,10 @@ class Application @Inject() (cache: CacheApi) extends Controller {
         case Some(str) if (str.length > 0) => str
         case _ => "None"
       }
-
-      val fcode = str_f match {
+      // Partial country name
+      val partial_input = CMappingDB.returnFullName(str_f)
+      // Full country name
+      val fcode = partial_input match {
         case str if (str.length > 2) => Try(CMappingDB.nameToCodeMap(str.toLowerCase))
           .getOrElse("None")
         case str if (str.length == 2) => str
@@ -66,6 +68,7 @@ class Application @Inject() (cache: CacheApi) extends Controller {
       println("Actual code: " + fcode)
       val res = Try(infoAboutCountries(fcode.toLowerCase))
 
+      // Just country code
       val countries = res match {
         case Success(result) if (!result.info.isEmpty) => result
         case _ => countriesNone

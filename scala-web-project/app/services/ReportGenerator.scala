@@ -68,7 +68,7 @@ object ReportGenerator {
 
   def infoAboutCountries: Map[String, CountryInfo] = {
     val countriesF = CountriesDAO.all
-    val countries = Await.result(countriesF, 10.seconds).take(3)
+    val countries = Await.result(countriesF, 10.seconds)
     val result = for {
       country <- countries
 
