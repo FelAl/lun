@@ -50,7 +50,7 @@ class Application @Inject() (cache: CacheApi) extends Controller {
       val code = request.get("code").head
 
       println("Input: " + code(0))
-      val str_filtered = """[ ]*[a-zA-Z ]+$""".r findFirstIn code(0)
+      val str_filtered = """[ ]*[a-zA-Z ]+$""".r findFirstIn code(0).trim
       val str_f = str_filtered match {
         case Some(str) if (str.forall(_ == ' ')) => "None"
         case Some(str) if (str.length > 0) => str
