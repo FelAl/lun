@@ -50,14 +50,18 @@ class Application @Inject() (cache: CacheApi) extends Controller {
       val code = request.get("code").head
 
       println("Input: " + code(0))
-      val str_filtered = """[ ]*[a-zA-Z ]+$""".r findFirstIn code(0).trim
+      val clean_input = code(0).trim.replaceAll("\\s+"," ")
+      val str_filtered = """[ ]*[a-zA-Z ]+$""".r findFirstIn clean_input
       val str_f = str_filtered match {
         case Some(str) if (str.forall(_ == ' ')) => "None"
         case Some(str) if (str.length > 0) => str
         case _ => "None"
       }
+      println("After filtering: " + str_f)
       // Partial country name
-      val partial_input = CMappingDB.returnFullName(str_f)
+      val partial_input = 
+        if(str_f.length != 2) CMappingDB.returnFullName(str_f)
+        else str_f
       // Full country name
       val fcode = partial_input match {
         case str if (str.length > 2) => Try(CMappingDB.nameToCodeMap(str.toLowerCase))
