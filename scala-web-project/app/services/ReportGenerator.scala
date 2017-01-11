@@ -21,7 +21,7 @@ case class RunwayTypes(country: String, types: String)
 object ReportGenerator {
   def typeOfRunwaysPerCountry: Seq[RunwayTypes] = {
     val countriesF = CountriesDAO.all
-    val countries = Await.result(countriesF, 10.seconds).take(3)
+    val countries = Await.result(countriesF, 10.seconds)
 
     val resultR = for {
       country <- countries 

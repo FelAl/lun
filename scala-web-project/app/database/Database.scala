@@ -16,6 +16,8 @@ object CountriesDAO {
   val db = Database.forConfig("databaseUrl")
 
   val countries = TableQuery[Countries]
+  val airports = TableQuery[Airports]
+  val runways = TableQuery[Runways]
 
   def findById(id: Int): Future[Option[Country]] = {
     val q = countries.filter(_.id === id)
@@ -23,6 +25,10 @@ object CountriesDAO {
     val result = db.run(action)
     val finalResult = result.map(_.headOption)
     finalResult
+  }
+
+  def findInfo(code: String) = {
+
   }
 
   def all: Future[Seq[Country]] = db.run(countries.result)

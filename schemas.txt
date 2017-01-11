@@ -172,3 +172,66 @@ awk -F "\"*,\"*" '{print "\""$3"\"""->""\""$2"\""}' countries.csv
 [a-zA-Z ]*
 
 SELECT le_ident, count(*) from "RUNWAYS" group by "le_ident" order by count(*) desc LIMIT 10;
+
+
+
+
+
+select * from "AIRPORTS" where iso_country = 'AE';
+
+Select * from "RUNWAYS" where airport_ref = (select id from "AIRPORTS" where iso_country = 'RU' LIMIT 1);
+
+Select airport_ident from "RUNWAYS" WHERE airport_ref IN (select id from "AIRPORTS" where iso_country = 'RU');
+
+Explain Select airport_ident from "RUNWAYS" WHERE airport_ref IN (select id from "AIRPORTS" where iso_country = 'RU');
+
+select airport_ident from "RUNWAYS" join "AIRPORTS" on "AIRPORTS".id="RUNWAYS".airport_ref join "COUNTRIES" on "COUNTRIES".code="AIRPORTS".iso_country and "COUNTRIES".code='AE';
+
+select airport_ident, "AIRPORTS".name from "RUNWAYS" join "AIRPORTS" on "AIRPORTS".id="RUNWAYS".airport_ref join "COUNTRIES" on "COUNTRIES".code="AIRPORTS".iso_country and "COUNTRIES".code='AE';
+
+
+
+Comparison
+Without join
+dblun=# Explain Select airport_ident from "RUNWAYS" WHERE airport_ref IN (select id from "AIRPORTS" where iso_country = 'RU');
+ Hash Semi Join  (cost=896.45..1852.95 rows=1111 width=5)
+   Hash Cond: ("RUNWAYS".airport_ref = "AIRPORTS".id)
+   ->  Seq Scan on "RUNWAYS"  (cost=0.00..840.36 rows=39536 width=9)
+   ->  Hash  (cost=885.15..885.15 rows=904 width=4)
+         ->  Bitmap Heap Scan on "AIRPORTS"  (cost=19.30..885.15 rows=904 width=4)
+               Recheck Cond: ((iso_country)::text = 'RU'::text)
+               ->  Bitmap Index Scan on "AIRPORT_IDX"  (cost=0.00..19.07 rows=904 width=0)
+                     Index Cond: ((iso_country)::text = 'RU'::text)
+
+
+With join
+dblun=# EXPLAIN select airport_ident, "AIRPORTS".name from "RUNWAYS" join "AIRPORTS" on "AIRPORTS".id="RUNWAYS".airport_ref join "COUNTRIES" on "COUNTRIES".code="AIRPORTS".iso_country and "COUNTRIES".code='RU';
+ Nested Loop  (cost=896.45..1906.53 rows=769 width=27)
+   ->  Seq Scan on "COUNTRIES"  (cost=0.00..6.09 rows=1 width=3)
+         Filter: ((code)::text = 'RU'::text)
+   ->  Hash Join  (cost=896.45..1892.76 rows=769 width=30)
+         Hash Cond: ("RUNWAYS".airport_ref = "AIRPORTS".id)
+         ->  Seq Scan on "RUNWAYS"  (cost=0.00..840.36 rows=39536 width=9)
+         ->  Hash  (cost=885.15..885.15 rows=904 width=29)
+               ->  Bitmap Heap Scan on "AIRPORTS"  (cost=19.30..885.15 rows=904 width=29)
+                     Recheck Cond: ((iso_country)::text = 'RU'::text)
+                     ->  Bitmap Index Scan on "AIRPORT_IDX"  (cost=0.00..19.07 rows=904 width=0)
+                           Index Cond: ((iso_country)::text = 'RU'::text)
+
+select array_agg("RUNWAYS".id), "AIRPORTS".name from "RUNWAYS" join "AIRPORTS" on "AIRPORTS".id="RUNWAYS".airport_ref join "COUNTRIES" on "COUNTRIES".code="AIRPORTS".iso_country and "COUNTRIES".code='US' group by "AIRPORTS".name;
+
+select "AIRPORTS".name, array_agg("RUNWAYS".id) from "RUNWAYS" join "AIRPORTS" on "AIRPORTS".id="RUNWAYS".airport_ref join "COUNTRIES" on "COUNTRIES".code="AIRPORTS".iso_country and "COUNTRIES".code='US' group by "AIRPORTS".name;
+
+select ap.name, array_agg(rn.id) from "RUNWAYS" rn join "AIRPORTS" ap on ap.id=rn.airport_ref join "COUNTRIES" cr on cr.code=ap.iso_country and cr.code='US' group by ap.name;
+--> -> ->
+    (Duplicate) - seattle airport                                      | {302282}
+    02 Ranch Airport                                                   | {251466,251467}
+    100 Aker Wood Airport                                              | {246936}
+    1001 Fourth Avenue Plaza Heliport                                  | {269105}
+    11 Tv Dallas Heliport                                              | {268869,268870}
+    123 Arcom Heliport                                                 | {265971}
+    183 Mile Heliport                                                  | {267033}
+    185 Monmouth Parkway Associates Helistop                           | {270490}
+    1st District Police Station Heliport                               | {268531}
+    2 X 4 Ranch Airport                                                | {254971,254969,254970}
+    ..........

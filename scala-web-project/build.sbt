@@ -9,7 +9,7 @@ scalaVersion := "2.11.7"
 libraryDependencies ++= Seq(
   jdbc,
   cache,
-  "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test,
+  "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0" % "test",
   "com.typesafe.slick" %% "slick" % "3.1.1",
   "com.typesafe.slick" %% "slick-hikaricp" % "3.1.1",
   "org.postgresql" % "postgresql" % "9.4-1201-jdbc41"
