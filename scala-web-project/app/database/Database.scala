@@ -28,6 +28,15 @@ object CountriesDAO {
   }
 
   def findInfo(code: String) = {
+    // val code = "RU"
+
+    val queryCode = sql"""select ap.name, array_agg(rn.id) from "RUNWAYS" rn 
+      join "AIRPORTS" ap on ap.id=rn.airport_ref 
+        join "COUNTRIES" cr on cr.code=ap.iso_country and cr.code='#$code' 
+      group by ap.name; """.as[(String, String)]
+    val resF = db.run(queryCode)
+    val res = Await.result(resF, 1.seconds)
+    res
 
   }
 
